@@ -16,7 +16,7 @@ const marqueeItemsReverse = [
 </script>
 
 <template>
-  <section class="bg-lh-bg px-6 md:px-12" style="padding-top: 80px; padding-bottom: 80px;">
+  <section class="bg-lh-bg px-6 md:px-12 overflow-hidden" style="padding-top: 80px; padding-bottom: 80px;">
     <div class="max-w-[960px] mx-auto text-center">
       <div class="animate-up"><SectionLabel text="Integrations" /></div>
 
@@ -39,10 +39,10 @@ const marqueeItemsReverse = [
 
       <!-- Double marquee rows -->
       <div class="integrations-overflow mt-12 animate-up" data-delay="150">
-        <div class="flex flex-col" style="gap: 12px;">
+        <div class="flex flex-col" style="gap: 12px; overflow: hidden;">
 
           <!-- Row 1: left to right -->
-          <div class="integrations-track">
+          <div class="integrations-track" style="overflow: hidden;">
             <div
               v-for="(tool, i) in marqueeItems"
               :key="`r1-${tool.name}-${i}`"
@@ -62,7 +62,7 @@ const marqueeItemsReverse = [
           </div>
 
           <!-- Row 2: right to left, slower, dimmer, offset -->
-          <div class="integrations-track-reverse">
+          <div class="integrations-track-reverse" style="overflow: hidden;">
             <div
               v-for="(tool, i) in marqueeItemsReverse"
               :key="`r2-${tool.name}-${i}`"

@@ -7,6 +7,21 @@ const tiers = [
   { color: '#F97316', dotClass: 'threshold-dot-orange',range: '70+:',   description: 'Ready. They know you. Send the message.' },
 ]
 
+const interactiveScore = ref(84)
+
+function handleSectionMouseMove(e: MouseEvent) {
+  if (window.matchMedia('(hover: none)').matches) return
+  const section = e.currentTarget as HTMLElement
+  const rect = section.getBoundingClientRect()
+  const y = e.clientY - rect.top
+  const progress = 1 - (y / rect.height)
+  interactiveScore.value = Math.round(70 + progress * 27)
+}
+
+function handleSectionMouseLeave() {
+  interactiveScore.value = 84
+}
+
 const messageSent = ref(false)
 let resetTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -21,7 +36,12 @@ function sendMessage() {
 </script>
 
 <template>
-  <section class="section-fade-top px-6 md:px-12" style="padding-top: 96px; padding-bottom: 96px;">
+  <section
+    class="section-fade-top px-6 md:px-12"
+    style="padding-top: 96px; padding-bottom: 96px;"
+    @mousemove="handleSectionMouseMove"
+    @mouseleave="handleSectionMouseLeave"
+  >
     <div class="max-w-[960px] mx-auto">
       <div class="flex flex-col md:flex-row gap-16 items-center">
 
@@ -65,10 +85,10 @@ function sendMessage() {
           </div>
         </div>
 
-        <!-- Right column: surface card (no card-hover lift on wrapper) -->
+        <!-- Right column: surface card, fixed size to prevent layout shift -->
         <div
           class="gauge-card-bg flex flex-col items-center animate-up"
-          style="border: 0.5px solid #1E2535; border-radius: 16px; padding: 32px; gap: 24px;"
+          style="border: 0.5px solid #1E2535; border-radius: 16px; padding: 32px; gap: 24px; flex-shrink: 0; width: 340px;"
           data-delay="100"
         >
           <!-- "3 prospects warming" status label above gauge -->
@@ -82,7 +102,7 @@ function sendMessage() {
           </div>
 
           <!-- Gauge with layered ambient glow -->
-          <div class="relative flex items-center justify-center" style="width: 300px; height: 300px;">
+          <div class="relative flex items-center justify-center" style="width: 300px; height: 220px;">
             <div
               class="absolute pointer-events-none"
               style="inset: -20px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 60%);"
@@ -91,7 +111,7 @@ function sendMessage() {
               class="absolute pointer-events-none"
               style="inset: 0; background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%); filter: blur(20px);"
             />
-            <HeatScoreGauge :score="84" :animated="true" />
+            <HeatScoreGauge :score="interactiveScore" :animated="true" />
           </div>
 
           <!-- Alert card — interactive, hover only (no gradient-border-wrap lift) -->

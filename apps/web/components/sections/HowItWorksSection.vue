@@ -1,12 +1,6 @@
 <script setup lang="ts">
-import { User, Flame, Send, ChevronDown } from 'lucide-vue-next'
-import { markRaw, ref } from 'vue'
-
-const activeStep = ref<number | null>(null)
-
-function toggleStep(index: number) {
-  activeStep.value = activeStep.value === index ? null : index
-}
+import { User, Flame, Send, MessageSquare, Heart } from 'lucide-vue-next'
+import { markRaw } from 'vue'
 
 const steps = [
   {
@@ -50,7 +44,22 @@ const steps = [
   },
 ]
 
-const spineColors = ['#7C3AED', '#EC4899', '#F97316']
+function handleMouseMove(e: MouseEvent) {
+  if (window.matchMedia('(hover: none)').matches) return
+  const card = e.currentTarget as HTMLElement
+  const rect = card.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  const centerX = rect.width / 2
+  const centerY = rect.height / 2
+  const rotateX = ((y - centerY) / centerY) * -6
+  const rotateY = ((x - centerX) / centerX) * 6
+  card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`
+}
+
+function handleMouseLeave(e: MouseEvent) {
+  ;(e.currentTarget as HTMLElement).style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)'
+}
 </script>
 
 <template>
@@ -80,84 +89,61 @@ const spineColors = ['#7C3AED', '#EC4899', '#F97316']
             --step-glow: ${step.stepGlow};
             --step-icon-shadow: ${step.iconShadow};
             background: linear-gradient(135deg, #0E1117 0%, #111827 100%);
-            border: 0.5px solid ${activeStep === index ? 'rgba(124,58,237,0.5)' : '#1E2535'};
+            border: 0.5px solid #1E2535;
             border-radius: 16px;
             padding: 32px;
-            cursor: pointer;
-            transition: opacity 200ms ease-out, transform 200ms ease-out, border-color 200ms ease-out;
-            opacity: ${activeStep !== null && activeStep !== index ? 0.7 : 1};
+            transition: transform 150ms ease-out;
           `"
           :data-delay="step.delay"
-          @click="toggleStep(index)"
+          @mousemove="handleMouseMove"
+          @mouseleave="handleMouseLeave"
         >
-          <div class="flex items-start justify-between mb-4">
-            <div class="text-[16px] font-semibold tracking-[0.08em] uppercase text-lh-muted">
-              {{ step.number }}
-            </div>
-            <ChevronDown
-              :size="14"
-              :style="{
-                color: '#475569',
-                transition: 'transform 300ms ease-out',
-                transform: activeStep === index ? 'rotate(180deg)' : 'rotate(0deg)',
-                flexShrink: 0,
-                marginTop: '2px',
-              }"
-            />
+          <div class="text-[16px] font-semibold tracking-[0.08em] uppercase text-lh-muted mb-4">
+            {{ step.number }}
           </div>
-
           <div
             class="step-icon-circle flex items-center justify-center mb-5"
             :style="`width: 72px; height: 72px; border-radius: 50%; background: ${step.iconBg}; border: ${step.iconBorder};`"
           >
             <component :is="step.icon" :size="32" :stroke-width="1.5" :style="{ color: step.iconColor }" />
           </div>
+          <h3 class="text-lh-text font-semibold" style="font-size: 20px; letter-spacing: -0.01em; line-height: 1.3;">{{ step.title }}</h3>
+          <p class="text-lh-secondary mt-2" style="font-size: 14px; line-height: 1.7;">{{ step.body }}</p>
 
-          <h3 class="text-lh-text font-semibold" style="font-size: 20px; letter-spacing: -0.01em; line-height: 1.3;">
-            {{ step.title }}
-          </h3>
-          <p class="text-lh-secondary mt-2" style="font-size: 14px; line-height: 1.7;">
-            {{ step.body }}
-          </p>
-
-          <!-- Expanded content -->
-          <div
-            :style="{
-              maxHeight: activeStep === index ? '200px' : '0',
-              overflow: 'hidden',
-              opacity: activeStep === index ? 1 : 0,
-              transition: 'max-height 300ms ease-out, opacity 300ms ease-out',
-            }"
-          >
-            <!-- Step 1 expanded -->
-            <div v-if="step.number === '01'" class="flex flex-wrap gap-2 mt-4">
-              <span v-for="badge in ['LinkedIn URL', 'CSV upload', 'Clay / Apollo']" :key="badge"
-                style="font-size: 12px; color: #8B9AB0; border: 0.5px solid #1E2535; padding: 4px 10px; border-radius: 20px;">
-                {{ badge }}
-              </span>
+          <!-- Always-visible extra content -->
+          <div v-if="step.number === '01'" class="flex flex-wrap gap-2 mt-4">
+            <span v-for="badge in ['LinkedIn URL', 'CSV upload', 'Clay / Apollo']" :key="badge"
+              style="font-size: 12px; color: #8B9AB0; border: 0.5px solid #1E2535; padding: 4px 10px; border-radius: 20px;">
+              {{ badge }}
+            </span>
+          </div>
+          <div v-if="step.number === '02'" class="flex flex-col gap-2 mt-4">
+            <div class="flex items-center gap-2" style="border-left: 2px solid #7C3AED; padding-left: 8px;">
+              <MessageSquare :size="12" :stroke-width="1.5" style="color: #8B9AB0; flex-shrink: 0;" />
+              <span style="font-size: 12px; color: #8B9AB0; line-height: 1.5;">Commented on a post about SaaS growth · just now</span>
             </div>
-            <!-- Step 2 expanded -->
-            <div v-if="step.number === '02'" class="flex flex-col gap-2 mt-4">
-              <div style="border-left: 2px solid #7C3AED; padding-left: 8px; font-size: 12px; color: #8B9AB0; line-height: 1.5;">
-                💬 Commented on a post about SaaS growth · just now
-              </div>
-              <div style="border-left: 2px solid #7C3AED; padding-left: 8px; font-size: 12px; color: #8B9AB0; line-height: 1.5;">
-                ❤️ Liked a post about outbound strategy · 3m ago
+            <div class="flex items-center gap-2" style="border-left: 2px solid #7C3AED; padding-left: 8px;">
+              <Heart :size="12" :stroke-width="1.5" style="color: #8B9AB0; flex-shrink: 0;" />
+              <span style="font-size: 12px; color: #8B9AB0; line-height: 1.5;">Liked a post about outbound strategy · 3m ago</span>
+            </div>
+          </div>
+          <div v-if="step.number === '03'" class="flex flex-col gap-2 mt-4">
+            <div class="flex items-center gap-3">
+              <span style="font-size: 11px; color: #475569; width: 90px; flex-shrink: 0;">Cold 0–40</span>
+              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
+                <div style="width: 30%; height: 100%; background: #1E2535; border-radius: 2px; border: 0.5px solid #475569;" />
               </div>
             </div>
-            <!-- Step 3 expanded -->
-            <div v-if="step.number === '03'" class="flex flex-col gap-2 mt-4">
-              <div class="flex items-center gap-3">
-                <span style="font-size: 11px; color: #475569; width: 90px; flex-shrink: 0;">Cold 0–40</span>
-                <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;"><div style="width: 30%; height: 100%; background: #1E2535; border-radius: 2px; border: 0.5px solid #475569;" /></div>
+            <div class="flex items-center gap-3">
+              <span style="font-size: 11px; color: #8B9AB0; width: 90px; flex-shrink: 0;">Warming 40–70</span>
+              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
+                <div style="width: 60%; height: 100%; background: #EC4899; border-radius: 2px;" />
               </div>
-              <div class="flex items-center gap-3">
-                <span style="font-size: 11px; color: #8B9AB0; width: 90px; flex-shrink: 0;">Warming 40–70</span>
-                <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;"><div style="width: 60%; height: 100%; background: #EC4899; border-radius: 2px;" /></div>
-              </div>
-              <div class="flex items-center gap-3">
-                <span style="font-size: 11px; color: #A78BFA; width: 90px; flex-shrink: 0;">Ready 70+</span>
-                <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;"><div style="width: 100%; height: 100%; background: linear-gradient(90deg, #7C3AED, #EC4899, #F97316); border-radius: 2px;" /></div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span style="font-size: 11px; color: #A78BFA; width: 90px; flex-shrink: 0;">Ready 70+</span>
+              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
+                <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #7C3AED, #EC4899, #F97316); border-radius: 2px;" />
               </div>
             </div>
           </div>
@@ -167,33 +153,26 @@ const spineColors = ['#7C3AED', '#EC4899', '#F97316']
       <!-- Desktop: CSS Grid with visible spine -->
       <div
         class="hidden md:grid mt-14 text-left"
-        style="grid-template-columns: 1fr 40px 1fr; grid-template-rows: auto auto auto; gap: 24px 0;"
+        style="grid-template-columns: 1fr 40px 1fr; grid-template-rows: auto auto auto; gap: 8px 0;"
       >
         <!-- Spine: column 2, all rows -->
-        <div
-          class="relative"
-          style="grid-column: 2; grid-row: 1 / 4;"
-        >
-          <!-- Vertical gradient line -->
+        <div class="relative" style="grid-column: 2; grid-row: 1 / 4;">
           <div
             class="absolute pointer-events-none"
             style="left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, rgba(124,58,237,0.6), rgba(236,72,153,0.5), rgba(249,115,22,0.4));"
           />
-          <!-- Dot at 16% -->
           <div class="absolute" style="left: 50%; top: 16%; transform: translate(-50%, -50%);">
             <div class="w-2 h-2 rounded-full" style="background: #7C3AED; box-shadow: 0 0 8px rgba(124,58,237,0.8);" />
           </div>
-          <!-- Dot at 50% -->
           <div class="absolute" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
             <div class="w-2 h-2 rounded-full" style="background: #EC4899; box-shadow: 0 0 8px rgba(236,72,153,0.8);" />
           </div>
-          <!-- Dot at 84% -->
           <div class="absolute" style="left: 50%; top: 84%; transform: translate(-50%, -50%);">
             <div class="w-2 h-2 rounded-full" style="background: #F97316; box-shadow: 0 0 8px rgba(249,115,22,0.8);" />
           </div>
         </div>
 
-        <!-- Step cards positioned in grid -->
+        <!-- Step cards -->
         <div
           v-for="(step, index) in steps"
           :key="step.number"
@@ -204,86 +183,62 @@ const spineColors = ['#7C3AED', '#EC4899', '#F97316']
             ${step.align === 'end' ? 'padding-left: 20px;' : 'padding-right: 20px;'}
             --step-glow: ${step.stepGlow};
             --step-icon-shadow: ${step.iconShadow};
+            background: linear-gradient(135deg, #0E1117 0%, #111827 100%);
+            border: 0.5px solid #1E2535;
+            border-radius: 16px;
+            padding: 32px;
+            transition: transform 150ms ease-out;
           `"
           :data-delay="step.delay"
+          @mousemove="handleMouseMove"
+          @mouseleave="handleMouseLeave"
         >
+          <div class="text-[16px] font-semibold tracking-[0.08em] uppercase text-lh-muted mb-4">
+            {{ step.number }}
+          </div>
           <div
-            style="border-radius: 16px; padding: 32px; cursor: pointer;"
-            :style="`
-              background: linear-gradient(135deg, #0E1117 0%, #111827 100%);
-              border: 0.5px solid ${activeStep === index ? 'rgba(124,58,237,0.5)' : '#1E2535'};
-              transition: opacity 200ms ease-out, transform 200ms ease-out, border-color 200ms ease-out;
-              opacity: ${activeStep !== null && activeStep !== index ? 0.7 : 1};
-              transform: ${activeStep !== null && activeStep !== index ? 'scale(0.98)' : 'scale(1)'};
-            `"
-            @click="toggleStep(index)"
+            class="step-icon-circle flex items-center justify-center mb-5"
+            :style="`width: 72px; height: 72px; border-radius: 50%; background: ${step.iconBg}; border: ${step.iconBorder};`"
           >
-            <div class="flex items-start justify-between mb-4">
-              <div class="text-[16px] font-semibold tracking-[0.08em] uppercase text-lh-muted">
-                {{ step.number }}
-              </div>
-              <ChevronDown
-                :size="14"
-                :style="{
-                  color: '#475569',
-                  transition: 'transform 300ms ease-out',
-                  transform: activeStep === index ? 'rotate(180deg)' : 'rotate(0deg)',
-                  flexShrink: 0,
-                  marginTop: '2px',
-                }"
-              />
+            <component :is="step.icon" :size="32" :stroke-width="1.5" :style="{ color: step.iconColor }" />
+          </div>
+          <h3 class="text-lh-text font-semibold" style="font-size: 20px; letter-spacing: -0.01em; line-height: 1.3;">{{ step.title }}</h3>
+          <p class="text-lh-secondary mt-2" style="font-size: 14px; line-height: 1.7;">{{ step.body }}</p>
+
+          <!-- Always-visible extra content -->
+          <div v-if="step.number === '01'" class="flex flex-wrap gap-2 mt-4">
+            <span v-for="badge in ['LinkedIn URL', 'CSV upload', 'Clay / Apollo']" :key="badge"
+              style="font-size: 12px; color: #8B9AB0; border: 0.5px solid #1E2535; padding: 4px 10px; border-radius: 20px;">
+              {{ badge }}
+            </span>
+          </div>
+          <div v-if="step.number === '02'" class="flex flex-col gap-2 mt-4">
+            <div class="flex items-center gap-2" style="border-left: 2px solid #7C3AED; padding-left: 8px;">
+              <MessageSquare :size="12" :stroke-width="1.5" style="color: #8B9AB0; flex-shrink: 0;" />
+              <span style="font-size: 12px; color: #8B9AB0; line-height: 1.5;">Commented on a post about SaaS growth · just now</span>
             </div>
-
-            <div
-              class="step-icon-circle flex items-center justify-center mb-5"
-              :style="`width: 72px; height: 72px; border-radius: 50%; background: ${step.iconBg}; border: ${step.iconBorder};`"
-            >
-              <component :is="step.icon" :size="32" :stroke-width="1.5" :style="{ color: step.iconColor }" />
+            <div class="flex items-center gap-2" style="border-left: 2px solid #7C3AED; padding-left: 8px;">
+              <Heart :size="12" :stroke-width="1.5" style="color: #8B9AB0; flex-shrink: 0;" />
+              <span style="font-size: 12px; color: #8B9AB0; line-height: 1.5;">Liked a post about outbound strategy · 3m ago</span>
             </div>
-
-            <h3 class="text-lh-text font-semibold" style="font-size: 20px; letter-spacing: -0.01em; line-height: 1.3;">
-              {{ step.title }}
-            </h3>
-            <p class="text-lh-secondary mt-2" style="font-size: 14px; line-height: 1.7;">
-              {{ step.body }}
-            </p>
-
-            <!-- Expanded content -->
-            <div
-              :style="{
-                maxHeight: activeStep === index ? '200px' : '0',
-                overflow: 'hidden',
-                opacity: activeStep === index ? 1 : 0,
-                transition: 'max-height 300ms ease-out, opacity 300ms ease-out',
-              }"
-            >
-              <div v-if="step.number === '01'" class="flex flex-wrap gap-2 mt-4">
-                <span v-for="badge in ['LinkedIn URL', 'CSV upload', 'Clay / Apollo']" :key="badge"
-                  style="font-size: 12px; color: #8B9AB0; border: 0.5px solid #1E2535; padding: 4px 10px; border-radius: 20px;">
-                  {{ badge }}
-                </span>
+          </div>
+          <div v-if="step.number === '03'" class="flex flex-col gap-2 mt-4">
+            <div class="flex items-center gap-3">
+              <span style="font-size: 11px; color: #475569; width: 90px; flex-shrink: 0;">Cold 0–40</span>
+              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
+                <div style="width: 30%; height: 100%; background: #1E2535; border-radius: 2px; border: 0.5px solid #475569;" />
               </div>
-              <div v-if="step.number === '02'" class="flex flex-col gap-2 mt-4">
-                <div style="border-left: 2px solid #7C3AED; padding-left: 8px; font-size: 12px; color: #8B9AB0; line-height: 1.5;">
-                  💬 Commented on a post about SaaS growth · just now
-                </div>
-                <div style="border-left: 2px solid #7C3AED; padding-left: 8px; font-size: 12px; color: #8B9AB0; line-height: 1.5;">
-                  ❤️ Liked a post about outbound strategy · 3m ago
-                </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span style="font-size: 11px; color: #8B9AB0; width: 90px; flex-shrink: 0;">Warming 40–70</span>
+              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
+                <div style="width: 60%; height: 100%; background: #EC4899; border-radius: 2px;" />
               </div>
-              <div v-if="step.number === '03'" class="flex flex-col gap-2 mt-4">
-                <div class="flex items-center gap-3">
-                  <span style="font-size: 11px; color: #475569; width: 90px; flex-shrink: 0;">Cold 0–40</span>
-                  <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;"><div style="width: 30%; height: 100%; background: #1E2535; border-radius: 2px; border: 0.5px solid #475569;" /></div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span style="font-size: 11px; color: #8B9AB0; width: 90px; flex-shrink: 0;">Warming 40–70</span>
-                  <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;"><div style="width: 60%; height: 100%; background: #EC4899; border-radius: 2px;" /></div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span style="font-size: 11px; color: #A78BFA; width: 90px; flex-shrink: 0;">Ready 70+</span>
-                  <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;"><div style="width: 100%; height: 100%; background: linear-gradient(90deg, #7C3AED, #EC4899, #F97316); border-radius: 2px;" /></div>
-                </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span style="font-size: 11px; color: #A78BFA; width: 90px; flex-shrink: 0;">Ready 70+</span>
+              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
+                <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #7C3AED, #EC4899, #F97316); border-radius: 2px;" />
               </div>
             </div>
           </div>

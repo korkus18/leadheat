@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowDown, MessageSquare, Heart, FileText } from 'lucide-vue-next'
-import { markRaw, ref, onMounted, onUnmounted } from 'vue'
+import { markRaw, ref, onMounted, onUnmounted, reactive } from 'vue'
 
 const allActivities = [
   { icon: markRaw(MessageSquare), iconColor: '#A78BFA', text: "Commented on Sarah Chen's post about PLG strategy",      time: '2m ago' },
@@ -13,9 +13,18 @@ const allActivities = [
 const activityItems = ref([...allActivities])
 const newItemIndex = ref<number | null>(null)
 
+const cardOffset = reactive({ x: 0, y: 0 })
+
+function handlePageMouseMove(e: MouseEvent) {
+  if (window.matchMedia('(hover: none)').matches) return
+  cardOffset.x = (e.clientX / window.innerWidth - 0.5) * 12
+  cardOffset.y = (e.clientY / window.innerHeight - 0.5) * 8
+}
+
 let timer: ReturnType<typeof setInterval> | null = null
 
 onMounted(() => {
+  window.addEventListener('mousemove', handlePageMouseMove)
   timer = setInterval(() => {
     const arr = activityItems.value.slice()
     const last = arr.pop()!
@@ -27,6 +36,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  window.removeEventListener('mousemove', handlePageMouseMove)
   if (timer) clearInterval(timer)
 })
 
@@ -96,6 +106,12 @@ function scrollToHowItWorks() {
       </div>
 
       <!-- Two-panel mock UI card -->
+      <div
+        :style="{
+          transition: 'transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          transform: `translateX(${cardOffset.x}px) translateY(${cardOffset.y}px)`,
+        }"
+      >
       <div class="mx-auto animate-up hero-card-float" style="max-width: 900px;" data-delay="250">
         <div class="gradient-border-wrap">
           <div style="background: #0E1117; border-radius: 15px; overflow: hidden; box-shadow: inset 0 1px 0 0 rgba(124,58,237,0.15);">
@@ -194,6 +210,7 @@ function scrollToHowItWorks() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </section>

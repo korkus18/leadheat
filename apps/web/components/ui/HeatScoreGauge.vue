@@ -29,8 +29,6 @@ const statusLabel = computed(() => {
 
 const showPulse = computed(() => displayScore.value >= 70)
 
-const gradientId = `gauge-gradient-${Math.random().toString(36).slice(2)}`
-
 onMounted(() => {
   if (!props.animated) {
     displayScore.value = props.score
@@ -53,19 +51,7 @@ onMounted(() => {
 
 watch(() => props.score, (newScore) => {
   if (!props.animated) { displayScore.value = newScore; return }
-  const start = performance.now()
-  const duration = 180
-  const from = displayScore.value
-
-  function step(now: number) {
-    const elapsed = now - start
-    const progress = Math.min(elapsed / duration, 1)
-    const eased = 1 - Math.pow(1 - progress, 2)
-    displayScore.value = Math.round(from + (newScore - from) * eased)
-    if (progress < 1) requestAnimationFrame(step)
-  }
-
-  requestAnimationFrame(step)
+  displayScore.value = newScore
 })
 </script>
 
@@ -73,12 +59,20 @@ watch(() => props.score, (newScore) => {
   <div class="flex flex-col items-center">
     <svg
       :width="SVG_SIZE"
-      :height="SVG_SIZE / 2 + 10"
-      :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE / 2 + 10}`"
+      :height="SVG_SIZE / 2 + 20"
+      :viewBox="`0 0 ${SVG_SIZE} ${SVG_SIZE / 2 + 20}`"
       overflow="visible"
+      style="display: block; margin: 0 auto;"
     >
       <defs>
-        <linearGradient :id="gradientId" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient
+          id="gaugeGradient"
+          gradientUnits="userSpaceOnUse"
+          :x1="CENTER - RADIUS"
+          y1="0"
+          :x2="CENTER + RADIUS"
+          y2="0"
+        >
           <stop offset="0%"   stop-color="#7C3AED" />
           <stop offset="50%"  stop-color="#EC4899" />
           <stop offset="100%" stop-color="#F97316" />
@@ -92,18 +86,19 @@ watch(() => props.score, (newScore) => {
         stroke="#1E2535"
         :stroke-width="STROKE"
         stroke-linecap="round"
+        opacity="0.4"
       />
 
       <!-- Filled arc -->
       <path
         :d="`M ${CENTER - RADIUS} ${CENTER} A ${RADIUS} ${RADIUS} 0 0 1 ${CENTER + RADIUS} ${CENTER}`"
         fill="none"
-        :stroke="`url(#${gradientId})`"
+        stroke="url(#gaugeGradient)"
         :stroke-width="STROKE"
         stroke-linecap="round"
         :stroke-dasharray="CIRCUMFERENCE"
         :stroke-dashoffset="dashOffset"
-        style="transition: stroke-dashoffset 0.05s linear;"
+        style="transition: stroke-dashoffset 300ms ease-out;"
       />
     </svg>
 
