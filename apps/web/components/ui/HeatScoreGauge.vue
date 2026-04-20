@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   score: number
@@ -45,6 +45,23 @@ onMounted(() => {
     const progress = Math.min(elapsed / duration, 1)
     const eased = 1 - Math.pow(1 - progress, 3)
     displayScore.value = Math.round(eased * target)
+    if (progress < 1) requestAnimationFrame(step)
+  }
+
+  requestAnimationFrame(step)
+})
+
+watch(() => props.score, (newScore) => {
+  if (!props.animated) { displayScore.value = newScore; return }
+  const start = performance.now()
+  const duration = 180
+  const from = displayScore.value
+
+  function step(now: number) {
+    const elapsed = now - start
+    const progress = Math.min(elapsed / duration, 1)
+    const eased = 1 - Math.pow(1 - progress, 2)
+    displayScore.value = Math.round(from + (newScore - from) * eased)
     if (progress < 1) requestAnimationFrame(step)
   }
 
