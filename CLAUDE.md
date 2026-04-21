@@ -736,3 +736,15 @@ Animation:  200ms ease-out
 
 Gradient is used only on: CTA buttons, Heat Score gauge fill, highlighted text.
 Never as a section background. Never decorative.
+
+---
+
+## Workflow Rules
+
+### After every completed task
+1. Run `cd apps/web && pnpm build` (or `pnpm dev` check if build takes too long)
+2. Report: what files were changed and what exactly was done
+3. Prepare a commit message in conventional format (e.g. `fix: smooth scroll`, `feat: problem section redesign`)
+4. DO NOT run `git commit` or `git push` until the user explicitly moves to the next task
+
+This rule applies to every task without exception.

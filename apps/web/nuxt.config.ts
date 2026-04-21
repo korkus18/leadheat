@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   app: {
     head: {
+      htmlAttrs: { lang: 'en' },
       title: 'LeadHeat — AI Pre-Engagement Engine for B2B Outreach',
       meta: [
         { name: 'description', content: 'Build familiarity with prospects before you send a single message. LeadHeat automates LinkedIn pre-engagement to increase reply rates 2–5×.' },
