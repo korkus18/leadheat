@@ -49,6 +49,11 @@ const prospects = [
 function scrollToHowItWorks() {
   document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })
 }
+
+const scrollToDemo = () => {
+  const el = document.getElementById('demo')
+  if (el) el.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -85,7 +90,7 @@ function scrollToHowItWorks() {
       </p>
 
       <div class="flex flex-wrap items-center justify-center gap-4 mt-10 animate-up" data-delay="150">
-        <GradientButton label="Book a demo" size="lg" href="#demo" />
+        <GradientButton label="Book a demo" size="lg" @click="scrollToDemo" />
         <button
           class="flex items-center gap-2 text-lh-text font-medium transition-all duration-200 ease-out hover:border-lh-violet"
           style="background: transparent; border: 0.5px solid #1E2535; border-radius: 6px; padding: 14px 24px; font-size: 15px; cursor: pointer;"
