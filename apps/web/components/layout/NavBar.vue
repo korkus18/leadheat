@@ -49,7 +49,7 @@ function scrollToTop() {
       <div class="hidden md:block nav-pill-sep" />
 
       <!-- CTA -->
-      <GradientButton label="Book a demo" size="sm" href="#demo" style="border-radius: 9999px; margin-left: 8px;" />
+      <GradientButton label="Book a demo" size="sm" href="#demo" style="border-radius: 9999px; margin-left: 8px;" @click.prevent="scrollTo('demo')" />
     </nav>
   </div>
 </template>
