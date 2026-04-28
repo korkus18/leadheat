@@ -14,7 +14,8 @@ const SVG_SIZE = 280
 const CENTER = SVG_SIZE / 2
 const CIRCUMFERENCE = Math.PI * RADIUS
 
-const displayScore = ref(0)
+const displayScore = ref(props.score ?? 72)
+const mountAnimationDone = ref(false)
 const dashOffset = computed(() => {
   const filled = (displayScore.value / 100) * CIRCUMFERENCE
   return CIRCUMFERENCE - filled
@@ -32,25 +33,32 @@ const showPulse = computed(() => displayScore.value >= 70)
 onMounted(() => {
   if (!props.animated) {
     displayScore.value = props.score
+    mountAnimationDone.value = true
     return
   }
   const start = performance.now()
   const duration = 1200
+  const initial = displayScore.value
   const target = props.score
+  const range = target - initial
 
   function step(now: number) {
     const elapsed = now - start
     const progress = Math.min(elapsed / duration, 1)
     const eased = 1 - Math.pow(1 - progress, 3)
-    displayScore.value = Math.round(eased * target)
-    if (progress < 1) requestAnimationFrame(step)
+    displayScore.value = Math.round(initial + eased * range)
+    if (progress < 1) {
+      requestAnimationFrame(step)
+    } else {
+      mountAnimationDone.value = true
+    }
   }
 
   requestAnimationFrame(step)
 })
 
 watch(() => props.score, (newScore) => {
-  if (!props.animated) { displayScore.value = newScore; return }
+  if (!mountAnimationDone.value) return
   displayScore.value = newScore
 })
 </script>

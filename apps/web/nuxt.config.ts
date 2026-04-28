@@ -1,6 +1,12 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-04-21',
   modules: ['@nuxtjs/tailwindcss'],
+  experimental: {
+    appManifest: false,
+  },
+  runtimeConfig: {
+    resendApiKey: process.env.RESEND_API_KEY,
+  },
   app: {
     head: {
       htmlAttrs: { lang: 'en' },

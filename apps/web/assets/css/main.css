@@ -1,5 +1,5 @@
 *, *::before, *::after { box-sizing: border-box; }
-html { background: #08090E; }
+html { background: #08090E; scroll-padding-top: 80px; }
 body {
   background: #08090E;
   background-image:

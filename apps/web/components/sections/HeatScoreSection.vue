@@ -117,8 +117,7 @@ function sendMessage() {
           <!-- Alert card — interactive, hover only (no gradient-border-wrap lift) -->
           <div
             class="alert-card"
-            style="background: #08090E; border: 0.5px solid #1E2535; border-radius: 10px; padding: 16px; width: 200px;"
-            @click="sendMessage"
+            :style="`background: #08090E; border: 0.5px solid #1E2535; border-radius: 10px; padding: 16px; width: 200px;${messageSent ? ' cursor: default;' : ''}`"
           >
             <div class="flex items-center gap-2 mb-1">
               <div class="ready-indicator" />
@@ -135,6 +134,7 @@ function sendMessage() {
                 :style="messageSent
                   ? 'background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #22c55e; cursor: default;'
                   : 'background: linear-gradient(90deg, #7C3AED, #EC4899, #F97316); border: none; color: white; cursor: pointer;'"
+                @click.stop="sendMessage"
               >
                 {{ messageSent ? '✓ Message scheduled' : 'Send message' }}
               </button>

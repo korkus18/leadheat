@@ -79,84 +79,13 @@ function handleMouseLeave(e: MouseEvent) {
         From cold prospect to warm contact. Automatically.
       </h2>
 
-      <!-- Mobile: simple flex column -->
-      <div class="flex flex-col gap-6 mt-14 text-left md:hidden">
-        <div
-          v-for="(step, index) in steps"
-          :key="step.number"
-          class="hiw-step-card animate-up"
-          :style="`
-            --step-glow: ${step.stepGlow};
-            --step-icon-shadow: ${step.iconShadow};
-            background: linear-gradient(135deg, #0E1117 0%, #111827 100%);
-            border: 0.5px solid #1E2535;
-            border-radius: 16px;
-            padding: 32px;
-            transition: transform 150ms ease-out;
-          `"
-          :data-delay="step.delay"
-          @mousemove="handleMouseMove"
-          @mouseleave="handleMouseLeave"
-        >
-          <div class="text-[16px] font-semibold tracking-[0.08em] uppercase text-lh-muted mb-4">
-            {{ step.number }}
-          </div>
-          <div
-            class="step-icon-circle flex items-center justify-center mb-5"
-            :style="`width: 72px; height: 72px; border-radius: 50%; background: ${step.iconBg}; border: ${step.iconBorder};`"
-          >
-            <component :is="step.icon" :size="32" :stroke-width="1.5" :style="{ color: step.iconColor }" />
-          </div>
-          <h3 class="text-lh-text font-semibold" style="font-size: 20px; letter-spacing: -0.01em; line-height: 1.3;">{{ step.title }}</h3>
-          <p class="text-lh-secondary mt-2" style="font-size: 14px; line-height: 1.7;">{{ step.body }}</p>
-
-          <!-- Always-visible extra content -->
-          <div v-if="step.number === '01'" class="flex flex-wrap gap-2 mt-4">
-            <span v-for="badge in ['LinkedIn URL', 'CSV upload', 'Clay / Apollo']" :key="badge"
-              style="font-size: 12px; color: #8B9AB0; border: 0.5px solid #1E2535; padding: 4px 10px; border-radius: 20px;">
-              {{ badge }}
-            </span>
-          </div>
-          <div v-if="step.number === '02'" class="flex flex-col gap-2 mt-4">
-            <div class="flex items-center gap-2" style="border-left: 2px solid #7C3AED; padding-left: 8px;">
-              <MessageSquare :size="12" :stroke-width="1.5" style="color: #8B9AB0; flex-shrink: 0;" />
-              <span style="font-size: 12px; color: #8B9AB0; line-height: 1.5;">Commented on a post about SaaS growth · just now</span>
-            </div>
-            <div class="flex items-center gap-2" style="border-left: 2px solid #7C3AED; padding-left: 8px;">
-              <Heart :size="12" :stroke-width="1.5" style="color: #8B9AB0; flex-shrink: 0;" />
-              <span style="font-size: 12px; color: #8B9AB0; line-height: 1.5;">Liked a post about outbound strategy · 3m ago</span>
-            </div>
-          </div>
-          <div v-if="step.number === '03'" class="flex flex-col gap-2 mt-4">
-            <div class="flex items-center gap-3">
-              <span style="font-size: 11px; color: #475569; width: 90px; flex-shrink: 0;">Cold 0–40</span>
-              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
-                <div style="width: 30%; height: 100%; background: #1E2535; border-radius: 2px; border: 0.5px solid #475569;" />
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <span style="font-size: 11px; color: #8B9AB0; width: 90px; flex-shrink: 0;">Warming 40–70</span>
-              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
-                <div style="width: 60%; height: 100%; background: #EC4899; border-radius: 2px;" />
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <span style="font-size: 11px; color: #A78BFA; width: 90px; flex-shrink: 0;">Ready 70+</span>
-              <div style="flex: 1; height: 4px; background: #1E2535; border-radius: 2px;">
-                <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #7C3AED, #EC4899, #F97316); border-radius: 2px;" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Desktop: CSS Grid with visible spine -->
+      <!-- Steps: stacked on mobile, two-column grid with spine on md+ -->
       <div
-        class="hidden md:grid mt-14 text-left"
-        style="grid-template-columns: 1fr 40px 1fr; grid-template-rows: auto auto auto; gap: 8px 0;"
+        class="flex flex-col gap-6 mt-14 text-left md:grid md:gap-y-2 md:gap-x-0"
+        style="grid-template-columns: 1fr 40px 1fr; grid-template-rows: auto auto auto;"
       >
-        <!-- Spine: column 2, all rows -->
-        <div class="relative" style="grid-column: 2; grid-row: 1 / 4;">
+        <!-- Spine: column 2, all rows. Desktop only. -->
+        <div class="hidden md:block relative" style="grid-column: 2; grid-row: 1 / 4;">
           <div
             class="absolute pointer-events-none"
             style="left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, rgba(124,58,237,0.6), rgba(236,72,153,0.5), rgba(249,115,22,0.4));"
